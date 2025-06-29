@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IP Info Tracker</title>
+  <style>
+    :root {
+      --bg: #111;
+      --card: #1c1c1c;
+      --accent: #7f5af0;
+      --text: #fff;
+      --muted: #aaa;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      user-select: none;
+    }
+
+    .search-bar {
+      max-width: 600px;
+      width: 100%;
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      border: none;
+      background-color: var(--card);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .search-bar input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-bar input:focus {
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .search-bar button {
+      background-color: var(--accent);
+      color: var(--text);
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+
+    .search-bar button:hover {
+      background-color: #a58bff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: 16px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.2);
+      user-select: none;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 900px;
+      height: 350px;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 0 15px rgba(127, 90, 240, 0.2);
+      user-select: none;
+    }
+
+    @media (max-width: 600px) {
+      .search-bar {
+        flex-direction: column;
+      }
+
+      .search-bar input,
+      .search-bar button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>IP Info Tracker</h1>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      id="ipInput"
+      placeholder="Enter IP or leave empty for your IP"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button id="searchBtn">Search</button>
+    <button id="myIpBtn">My IP</button>
+  </div>
+
+  <div class="grid" id="infoGrid">
+    <!-- Placeholder cards on load -->
+    <div class="card"><h2>IP</h2><p>—</p></div>
+    <div class="card"><h2>City</h2><p>—</p></div>
+    <div class="card"><h2>Region</h2><p>—</p></div>
+    <div class="card"><h2>Country</h2><p>—</p></div>
+    <div class="card"><h2>ISP</h2><p>—</p></div>
+    <div class="card"><h2>Latitude</h2><p>—</p></div>
+    <div class="card"><h2>Longitude</h2><p>—</p></div>
+  </div>
+
+  <iframe
+    id="map"
+    src="https://maps.google.com/maps?q=0,0&z=1&output=embed"
+    loading="lazy"
+    title="Map preview"
+  ></iframe>
+
+  <script>
+    async function getIPInfo(ip = "") {
+      try {
+        const url = ip
+          ? `https://ipapi.co/${ip}/json/`
+          : "https://ipapi.co/json/";
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch data");
+        const data = await res.json();
+
+        // ipapi.co returns error field if IP invalid
+        if (data.error) {
+          alert(data.reason || "Invalid IP or no data found.");
+          return;
+        }
+
+        const grid = document.getElementById("infoGrid");
+        grid.innerHTML = `
+          <div class="card"><h2>IP</h2><p>${data.ip || "—"}</p></div>
+          <div class="card"><h2>City</h2><p>${data.city || "—"}</p></div>
+          <div class="card"><h2>Region</h2><p>${data.region || "—"}</p></div>
+          <div class="card"><h2>Country</h2><p>${data.country_name || "—"}</p></div>
+          <div class="card"><h2>ISP</h2><p>${data.org || "—"}</p></div>
+          <div class="card"><h2>Latitude</h2><p>${data.latitude || "—"}</p></div>
+          <div class="card"><h2>Longitude</h2><p>${data.longitude || "—"}</p></div>
+        `;
+
+        const lat = data.latitude || 0;
+        const lon = data.longitude || 0;
+
+        document.getElementById(
+          "map"
+        ).src = `https://maps.google.com/maps?q=${lat},${lon}&z=14&output=embed`;
+      } catch (error) {
+        alert("Failed to fetch IP info. Please try again later.");
+        console.error(error);
+      }
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      const ip = document.getElementById("ipInput").value.trim();
+      getIPInfo(ip);
+    });
+
+    document.getElementById("myIpBtn").addEventListener("click", () => {
+      document.getElementById("ipInput").value = "";
+      getIPInfo();
+    });
+
+    // Show placeholders on load, then fetch user's IP info
+    setTimeout(() => getIPInfo(), 500);
+  </script>
+</body>
+</html>

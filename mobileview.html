@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Responsive Layout Tester (Mobile)</title>
+<style>
+  :root {
+    --bg: #111;
+    --card: #1c1c1c;
+    --accent: #7f5af0;
+    --text: #fff;
+    --muted: #aaa;
+  }
+
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+
+  .container {
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .editor {
+    flex: 1 1 400px;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  textarea {
+    flex: 1;
+    background: #222;
+    border: none;
+    border-radius: 8px;
+    color: var(--text);
+    font-family: monospace;
+    font-size: 1rem;
+    padding: 1rem;
+    resize: vertical;
+    min-height: 300px;
+    outline: none;
+  }
+
+  button {
+    margin-top: 1rem;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    background: var(--accent);
+    color: var(--text);
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: #a58bff;
+  }
+
+  .preview-container {
+    flex: 1 1 400px;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .device-select {
+    background: var(--bg);
+    padding: 1rem;
+    border-bottom: 1px solid #333;
+    width: 100%;
+    text-align: center;
+  }
+
+  select {
+    background: var(--card);
+    color: var(--text);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  iframe {
+    margin: 1rem auto;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+    width: 375px; /* iPhone X default width */
+    height: 667px; /* iPhone X default height */
+    touch-action: none; /* prevent browser gestures */
+  }
+
+  /* Hide native scrollbars but still scrollable */
+  iframe::-webkit-scrollbar {
+    display: none;
+  }
+  iframe {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Responsive Layout Tester (Mobile Only)</h1>
+
+<div class="container">
+  <div class="editor">
+    <label for="codeInput">Paste your HTML/CSS here:</label>
+    <textarea id="codeInput" placeholder="Paste your full HTML code here..."></textarea>
+    <button id="loadBtn">Load Preview</button>
+  </div>
+
+  <div class="preview-container">
+    <div class="device-select">
+      <label for="deviceSize">Select Device:</label>
+      <select id="deviceSize">
+        <option value="375x667" selected>iPhone X (375x667)</option>
+        <option value="360x640">Pixel 2 (360x640)</option>
+        <option value="414x896">iPhone XR (414x896)</option>
+        <option value="320x568">iPhone SE (320x568)</option>
+      </select>
+    </div>
+    <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+</div>
+
+<script>
+  const codeInput = document.getElementById('codeInput');
+  const loadBtn = document.getElementById('loadBtn');
+  const previewFrame = document.getElementById('previewFrame');
+  const deviceSize = document.getElementById('deviceSize');
+
+  // Function to set iframe size based on selected device
+  function updateIframeSize() {
+    const [width, height] = deviceSize.value.split('x').map(Number);
+    previewFrame.style.width = width + 'px';
+    previewFrame.style.height = height + 'px';
+  }
+
+  deviceSize.addEventListener('change', updateIframeSize);
+  updateIframeSize();
+
+  // Load preview on button click
+  loadBtn.addEventListener('click', () => {
+    const htmlCode = codeInput.value.trim();
+    if (!htmlCode) {
+      alert('Please paste some HTML/CSS code!');
+      return;
+    }
+
+    // Write code into iframe
+    const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+    doc.open();
+    doc.write(htmlCode);
+    doc.close();
+
+    // Disable scroll wheel & keyboard inside iframe
+    // Implement drag to scroll
+
+    // Remove scrollbars but allow scrolling by dragging:
+    previewFrame.contentWindow.addEventListener('wheel', e => {
+      e.preventDefault();
+    }, { passive: false });
+
+    // Keyboard disabling
+    previewFrame.contentWindow.addEventListener('keydown', e => {
+      e.preventDefault();
+    });
+
+    // Drag-to-scroll implementation
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    const iframeBody = doc.body;
+
+    iframeBody.style.cursor = 'grab';
+    iframeBody.style.overflow = 'auto';
+
+    iframeBody.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.pageX - iframeBody.offsetLeft;
+      startY = e.pageY - iframeBody.offsetTop;
+      scrollLeft = iframeBody.scrollLeft;
+      scrollTop = iframeBody.scrollTop;
+      iframeBody.style.cursor = 'grabbing';
+    });
+
+    iframeBody.addEventListener('mouseleave', () => {
+      isDragging = false;
+      iframeBody.style.cursor = 'grab';
+    });
+
+    iframeBody.addEventListener('mouseup', () => {
+      isDragging = false;
+      iframeBody.style.cursor = 'grab';
+    });
+
+    iframeBody.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - iframeBody.offsetLeft;
+      const y = e.pageY - iframeBody.offsetTop;
+      const walkX = (x - startX) * 1.5; //scroll-fast
+      const walkY = (y - startY) * 1.5;
+      iframeBody.scrollLeft = scrollLeft - walkX;
+      iframeBody.scrollTop = scrollTop - walkY;
+    });
+
+  });
+</script>
+
+</body>
+</html>

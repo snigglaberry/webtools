@@ -4,81 +4,133 @@
   <meta charset="UTF-8" />
   <title>Encryptor & Decryptor</title>
   <style>
+    :root {
+      --bg-dark: #0f0f0f;
+      --panel-bg: #1a1a1a;
+      --primary-purple: #7f5af0;
+      --primary-purple-hover: #9b7bff;
+      --text-primary: #fff;
+      --shadow-purple-20: rgba(127, 90, 240, 0.2);
+      --shadow-purple-10: rgba(127, 90, 240, 0.1);
+      --shadow-black-50: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Reset and layout */
     body {
-      background: #1c1c1e;
-      color: #fff;
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+      align-items: center;
     }
+
     h1 {
-      text-align: center;
       margin-bottom: 1rem;
+      user-select: none;
     }
+
     .container {
-      max-width: 700px;
-      margin: auto;
-      background: #2c2c2e;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      padding: 10px;
+      background: var(--panel-bg);
+      padding: 1.5rem 2rem;
       border-radius: 12px;
-      border: none;
-      resize: none;
-      font-size: 1rem;
-      background: #3a3a3c;
-      color: white;
+      box-shadow: 0 0 10px var(--shadow-purple-20);
+      max-width: 700px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
     }
+
     .tabs {
       display: flex;
       justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 1rem;
     }
     .tabs button {
-      background: #3a3a3c;
+      background: var(--panel-bg);
       border: none;
-      color: white;
-      padding: 10px 20px;
-      margin: 0 5px;
+      color: var(--text-primary);
+      padding: 0.6rem 1.2rem;
+      margin: 0 0.4rem;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s;
+      font-size: 14px;
+      transition: background 0.2s;
+      user-select: none;
+      box-shadow: inset 0 0 5px var(--shadow-black-50);
     }
     .tabs button.active {
-      background: #5e5ce6;
+      background: var(--primary-purple);
+      box-shadow: 0 0 10px var(--shadow-purple-20);
     }
+    .tabs button:hover:not(.active) {
+      background: var(--primary-purple-hover);
+      box-shadow: 0 0 8px var(--shadow-purple-20);
+    }
+
+    textarea {
+      background: var(--panel-bg);
+      border: none;
+      color: var(--text-primary);
+      padding: 1rem;
+      resize: none;
+      font-size: 14px;
+      border-radius: 12px;
+      height: 120px;
+      box-shadow: inset 0 0 5px var(--shadow-black-50);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
     .actions {
       display: flex;
       justify-content: space-between;
-      margin-top: 10px;
+      margin-top: 1rem;
     }
     .actions button {
       flex: 1;
-      margin: 5px;
-      padding: 10px;
-      background: #5e5ce6;
+      margin: 0 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: var(--primary-purple);
       border: none;
       border-radius: 10px;
-      color: white;
-      font-weight: bold;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.2s;
+      user-select: none;
+      box-shadow: 0 0 10px var(--shadow-purple-20);
     }
     .actions button:hover {
-      background: #7b79ff;
+      background: var(--primary-purple-hover);
+      box-shadow: 0 0 12px var(--shadow-purple-20);
     }
+
     .output {
-      margin-top: 10px;
-      background: #2a2a2c;
-      padding: 10px;
+      margin-top: 1rem;
+      background: var(--panel-bg);
+      padding: 1rem;
       border-radius: 12px;
       min-height: 80px;
       word-wrap: break-word;
+      box-shadow: inset 0 0 5px var(--shadow-black-50);
+      font-family: 'Segoe UI', monospace;
+      font-size: 14px;
+      user-select: text;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 768px) {
+      .actions {
+        flex-direction: column;
+      }
+      .actions button {
+        margin: 0.3rem 0;
+      }
     }
   </style>
 </head>
@@ -136,7 +188,7 @@
     }
 
     function decrypt() {
-      const input = document.getElementById("input").value;
+      const input = document.getElementById("input").value.trim();
       let result = "";
 
       if (!input) return;
@@ -155,7 +207,7 @@
         }
         document.getElementById("output").textContent = result;
       } catch (e) {
-        document.getElementById("output").textContent = "❌ Failed to decode";
+        document.getElementById("output").textContent = "❌ Failed to decode!";
       }
     }
 

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Image Format Converter</title>
+  <style>
+    :root {
+      --bg: #111;
+      --card: #1c1c1c;
+      --accent: #7f5af0;
+      --text: #fff;
+      --muted: #aaa;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+
+    .converter {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    label {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    input[type="file"] {
+      background-color: var(--bg);
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    select {
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+      background-color: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+    }
+
+    select:focus {
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    button {
+      background-color: var(--accent);
+      color: var(--text);
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #a58bff;
+    }
+
+    .preview-container {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    img,
+    video {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+    }
+
+    .download-link {
+  margin-top: 1rem;
+  display: inline-block;
+  background: var(--accent);
+  color: #fff; /* changed from var(--bg) to white */
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+    .download-link:hover {
+      background: #a58bff;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Image Format Converter</h1>
+  <div class="converter">
+    <label for="fileInput">Choose image/video file</label>
+    <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp, image/gif, video/webm" />
+
+    <label for="formatSelect">Convert to</label>
+    <select id="formatSelect" disabled>
+      <option value="">Select format</option>
+    </select>
+
+    <button id="convertBtn" disabled>Convert</button>
+
+    <div class="preview-container" id="previewContainer"></div>
+    <a id="downloadLink" class="download-link" href="#" download style="display:none;">Download Converted File</a>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const formatSelect = document.getElementById('formatSelect');
+    const convertBtn = document.getElementById('convertBtn');
+    const previewContainer = document.getElementById('previewContainer');
+    const downloadLink = document.getElementById('downloadLink');
+
+    let fileData = null;
+    let fileType = null; // 'image' or 'video'
+
+    // Supported formats for conversion by input type
+    const conversionMap = {
+      image: ['png', 'jpeg', 'gif', 'webp'],
+      video: ['webm', 'gif']
+    };
+
+    fileInput.addEventListener('change', () => {
+      previewContainer.innerHTML = '';
+      downloadLink.style.display = 'none';
+      formatSelect.innerHTML = '<option value="">Select format</option>';
+      convertBtn.disabled = true;
+
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // Determine type and extension
+      const mime = file.type;
+      if (mime.startsWith('image/')) {
+        fileType = 'image';
+      } else if (mime.startsWith('video/')) {
+        fileType = 'video';
+      } else {
+        alert('Unsupported file type!');
+        return;
+      }
+
+      // Show preview
+      if (fileType === 'image') {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.alt = 'Uploaded Image Preview';
+        previewContainer.appendChild(img);
+      } else if (fileType === 'video') {
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(file);
+        video.controls = true;
+        previewContainer.appendChild(video);
+      }
+
+      // Populate formats (exclude original format)
+      const ext = mime.split('/')[1].toLowerCase();
+      let formats = conversionMap[fileType].filter(f => f !== ext);
+      if(formats.length === 0) {
+        formatSelect.innerHTML = '<option value="">No alternative formats available</option>';
+        formatSelect.disabled = true;
+        return;
+      }
+      formatSelect.disabled = false;
+      formats.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.textContent = f.toUpperCase();
+        formatSelect.appendChild(opt);
+      });
+      formatSelect.value = '';
+    });
+
+    convertBtn.addEventListener('click', async () => {
+      if (!fileInput.files[0] || !formatSelect.value) return;
+
+      convertBtn.disabled = true;
+      convertBtn.textContent = 'Converting...';
+      downloadLink.style.display = 'none';
+      previewContainer.innerHTML = '';
+
+      const file = fileInput.files[0];
+      const targetFormat = formatSelect.value;
+
+      if (fileType === 'image') {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          // Convert canvas to chosen format
+          const mimeType = `image/${targetFormat === 'jpg' ? 'jpeg' : targetFormat}`;
+          canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            previewContainer.innerHTML = '';
+            const previewImg = document.createElement('img');
+            previewImg.src = url;
+            previewImg.alt = 'Converted Image Preview';
+            previewContainer.appendChild(previewImg);
+
+            downloadLink.href = url;
+            downloadLink.download = `converted.${targetFormat}`;
+            downloadLink.style.display = 'inline-block';
+
+            convertBtn.disabled = false;
+            convertBtn.textContent = 'Convert';
+          }, mimeType, 1);
+        };
+        img.onerror = () => {
+          alert('Failed to load image for conversion.');
+          convertBtn.disabled = false;
+          convertBtn.textContent = 'Convert';
+        };
+
+      } else if (fileType === 'video') {
+        if(targetFormat === 'gif') {
+          alert('Video to GIF conversion is not supported in this demo.');
+          convertBtn.disabled = false;
+          convertBtn.textContent = 'Convert';
+          return;
+        }
+        // For webm to webm or webm to gif (not supported here)
+        alert('Video conversion currently not supported.');
+        convertBtn.disabled = false;
+        convertBtn.textContent = 'Convert';
+      }
+    });
+
+    // Enable convert button only when format selected
+    formatSelect.addEventListener('change', () => {
+      convertBtn.disabled = !formatSelect.value;
+    });
+  </script>
+</body>
+</html>

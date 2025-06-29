@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Text Comparator</title>
+<style>
+  :root {
+    --bg-dark: #0f0f0f;
+    --panel-bg: #1a1a1a;
+    --primary-purple: #7f5af0;
+    --primary-purple-hover: #9b7bff;
+    --text-primary: #fff;
+    --diff-added: #144214cc; /* dark green transparent */
+    --diff-removed: #7f1d1dcc; /* dark red transparent */
+    --diff-unchanged: transparent;
+    --shadow-purple-20: rgba(127, 90, 240, 0.2);
+    --shadow-black-50: rgba(0, 0, 0, 0.5);
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 1rem;
+    box-sizing: border-box;
+    align-items: center;
+  }
+  h1 {
+    user-select: none;
+    margin-bottom: 1rem;
+  }
+  .container {
+    background: var(--panel-bg);
+    border-radius: 12px;
+    box-shadow: 0 0 10px var(--shadow-purple-20);
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .editors {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  textarea {
+    background: var(--panel-bg);
+    border: none;
+    color: var(--text-primary);
+    padding: 1rem;
+    resize: vertical;
+    font-size: 14px;
+    border-radius: 12px;
+    min-height: 120px;
+    box-shadow: inset 0 0 5px var(--shadow-black-50);
+    font-family: 'Segoe UI', monospace;
+    flex: 1 1 45%;
+    min-width: 250px;
+  }
+  button {
+    background: var(--primary-purple);
+    border: none;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 0 10px var(--shadow-purple-20);
+    transition: background 0.2s;
+    padding: 0.6rem 1.5rem;
+    align-self: flex-start;
+  }
+  button:hover {
+    background: var(--primary-purple-hover);
+    box-shadow: 0 0 12px var(--shadow-purple-20);
+  }
+  .output-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .output-box {
+    flex: 1 1 45%;
+    min-width: 250px;
+    background: var(--panel-bg);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: inset 0 0 5px var(--shadow-black-50);
+    white-space: pre-wrap;
+    font-family: 'Segoe UI', monospace;
+    font-size: 14px;
+    min-height: 150px;
+    overflow-y: auto;
+  }
+  .added {
+    background-color: var(--diff-added);
+  }
+  .removed {
+    background-color: var(--diff-removed);
+  }
+  .unchanged {
+    background-color: var(--diff-unchanged);
+  }
+  @media (max-width: 768px) {
+    .editors, .output-container {
+      flex-direction: column;
+    }
+    .output-box, textarea {
+      flex-basis: 100%;
+      min-width: auto;
+    }
+  }
+</style>
+</head>
+<body>
+  <h1>Text Comparator</h1>
+  <div class="container">
+    <div class="editors">
+      <textarea id="text1" placeholder="Paste first text here..."></textarea>
+      <textarea id="text2" placeholder="Paste second text here..."></textarea>
+    </div>
+    <button id="compare-btn">Compare</button>
+    <div class="output-container" style="margin-top:1rem;">
+      <div class="output-box" id="output1" aria-label="Differences in first text"></div>
+      <div class="output-box" id="output2" aria-label="Differences in second text"></div>
+    </div>
+  </div>
+
+  <script>
+    // Basic word-level diff helper function
+    function diffWords(oldStr, newStr) {
+      const oldWords = oldStr.split(/\s+/);
+      const newWords = newStr.split(/\s+/);
+
+      const result1 = [];
+      const result2 = [];
+
+      let i = 0, j = 0;
+      while (i < oldWords.length || j < newWords.length) {
+        if (i < oldWords.length && j < newWords.length && oldWords[i] === newWords[j]) {
+          // Same word
+          result1.push({text: oldWords[i], type: 'unchanged'});
+          result2.push({text: newWords[j], type: 'unchanged'});
+          i++; j++;
+        } else if (j < newWords.length && !oldWords.includes(newWords[j])) {
+          // Word added in new
+          result1.push({text: '', type: 'unchanged'});
+          result2.push({text: newWords[j], type: 'added'});
+          j++;
+        } else if (i < oldWords.length && !newWords.includes(oldWords[i])) {
+          // Word removed from old
+          result1.push({text: oldWords[i], type: 'removed'});
+          result2.push({text: '', type: 'unchanged'});
+          i++;
+        } else {
+          // Words differ but appear in both; fallback to matching words
+          if (i < oldWords.length) {
+            result1.push({text: oldWords[i], type: 'removed'});
+            i++;
+          }
+          if (j < newWords.length) {
+            result2.push({text: newWords[j], type: 'added'});
+            j++;
+          }
+        }
+      }
+
+      return [result1, result2];
+    }
+
+    function renderDiff(diffArray) {
+      return diffArray.map(wordObj => {
+        if (!wordObj.text) return '';
+        return `<span class="${wordObj.type}">${wordObj.text}</span>`;
+      }).join(' ');
+    }
+
+    document.getElementById('compare-btn').addEventListener('click', () => {
+      const text1 = document.getElementById('text1').value.trim();
+      const text2 = document.getElementById('text2').value.trim();
+
+      if (!text1 && !text2) {
+        alert('Please enter text in one or both fields.');
+        return;
+      }
+
+      const [diff1, diff2] = diffWords(text1, text2);
+
+      document.getElementById('output1').innerHTML = renderDiff(diff1);
+      document.getElementById('output2').innerHTML = renderDiff(diff2);
+    });
+  </script>
+</body>
+</html>

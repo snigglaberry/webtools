@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON Formatter</title>
+  <style>
+    :root {
+      --bg-dark: #0f0f0f;
+      --panel-bg: #1a1a1a;
+      --primary-purple: #7f5af0;
+      --primary-purple-hover: #9b7bff;
+      --text-primary: #fff;
+      --shadow-purple-20: rgba(127, 90, 240, 0.2);
+      --shadow-black-50: rgba(0, 0, 0, 0.5);
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+    .container {
+      background: var(--panel-bg);
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px var(--shadow-purple-20);
+      max-width: 600px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    textarea {
+      background: var(--panel-bg);
+      border: none;
+      color: var(--text-primary);
+      padding: 1rem;
+      resize: vertical;
+      font-size: 14px;
+      border-radius: 12px;
+      min-height: 200px;
+      box-shadow: inset 0 0 5px var(--shadow-black-50);
+      font-family: 'Segoe UI', monospace;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+    button {
+      padding: 0.6rem 1.5rem;
+      background: var(--primary-purple);
+      border: none;
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 0 10px var(--shadow-purple-20);
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--primary-purple-hover);
+      box-shadow: 0 0 12px var(--shadow-purple-20);
+    }
+    .error {
+      color: #ff6b6b;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      user-select: none;
+      white-space: pre-wrap;
+      font-family: 'Segoe UI', monospace;
+    }
+    @media (max-width: 480px) {
+      .container {
+        max-width: 90vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>JSON Formatter</h1>
+  <div class="container">
+    <textarea id="json-input" placeholder="Paste your JSON here..."></textarea>
+    <div class="error" id="error-msg" style="display:none;"></div>
+    <div class="buttons">
+      <button id="format-btn">Format (Pretty Print)</button>
+      <button id="minify-btn">Minify</button>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('json-input');
+    const errorMsg = document.getElementById('error-msg');
+    const formatBtn = document.getElementById('format-btn');
+    const minifyBtn = document.getElementById('minify-btn');
+
+    function clearError() {
+      errorMsg.style.display = 'none';
+      errorMsg.textContent = '';
+    }
+
+    formatBtn.addEventListener('click', () => {
+      clearError();
+      try {
+        const parsed = JSON.parse(input.value);
+        input.value = JSON.stringify(parsed, null, 2);
+      } catch (e) {
+        errorMsg.style.display = 'block';
+        errorMsg.textContent = '❌ Invalid JSON:\n' + e.message;
+      }
+    });
+
+    minifyBtn.addEventListener('click', () => {
+      clearError();
+      try {
+        const parsed = JSON.parse(input.value);
+        input.value = JSON.stringify(parsed);
+      } catch (e) {
+        errorMsg.style.display = 'block';
+        errorMsg.textContent = '❌ Invalid JSON:\n' + e.message;
+      }
+    });
+  </script>
+</body>
+</html>

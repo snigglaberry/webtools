@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live HTML/CSS/JS Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .controls {
+      background: #1a1a1a;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.2);
+      margin-bottom: 1rem;
+    }
+
+    .controls button {
+      padding: 0.6rem 1.2rem;
+      margin-right: 0.5rem;
+      background: #7f5af0;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .controls button:hover {
+      background: #9b7bff;
+    }
+
+    .editor-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      background: #1a1a1a;
+      border: none;
+      color: #fff;
+      padding: 1rem;
+      resize: none;
+      font-size: 14px;
+      border-radius: 12px;
+      height: 30vh;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    iframe {
+      flex: 1;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .editor-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <div>
+      <button onclick="runCode()">Run</button>
+      <button onclick="fullscreen()">Fullscreen</button>
+    </div>
+    <span style="font-weight: 600; font-size: 1.1rem;">Live HTML/CSS/JS Editor</span>
+  </div>
+
+  <div class="editor-wrap">
+    <textarea id="html" placeholder="HTML"></textarea>
+    <textarea id="css" placeholder="CSS"></textarea>
+    <textarea id="js" placeholder="JavaScript"></textarea>
+  </div>
+
+  <iframe id="preview"></iframe>
+
+  <script>
+    function runCode() {
+      const html = document.getElementById('html').value;
+      const css = document.getElementById('css').value;
+      const js = document.getElementById('js').value;
+      const output = document.getElementById('preview');
+      output.srcdoc = `
+        <!DOCTYPE html>
+        <html>
+        <head><style>${css}</style></head>
+        <body>${html}<script>${js}<\/script></body>
+        </html>
+      `;
+    }
+
+    function fullscreen() {
+      const iframe = document.getElementById('preview');
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.webkitRequestFullscreen) {
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) {
+        iframe.msRequestFullscreen();
+      }
+    }
+
+    window.onload = runCode;
+  </script>
+</body>
+</html>

@@ -1,162 +1,251 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Responsive Layout Tester (Mobile)</title>
-<style>
-  :root {
-    --bg: #111;
-    --card: #1c1c1c;
-    --accent: #7f5af0;
-    --text: #fff;
-    --muted: #aaa;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mobile website tester</title>
+  <style>
+    :root {
+      --bg: #111;
+      --card: #1c1c1c;
+      --accent: #7f5af0;
+      --text: #fff;
+      --muted: #aaa;
+      --kbd-bg: #222;
+      --kbd-key-bg: #333;
+      --kbd-key-hover: #7f5af0;
+    }
 
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-  }
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    padding: 2rem;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
 
-  h1 {
-    margin-bottom: 1.5rem;
-  }
+    h1 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
 
-  .container {
-    max-width: 900px;
-    width: 100%;
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
 
-  .editor {
-    flex: 1 1 400px;
-    background: var(--card);
-    border-radius: 12px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-  }
+    .editor {
+      flex: 1 1 400px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
 
-  label {
-    margin-bottom: 0.5rem;
-    color: var(--accent);
-    font-weight: 600;
-  }
+    label {
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
 
-  textarea {
-    flex: 1;
-    background: #222;
-    border: none;
-    border-radius: 8px;
-    color: var(--text);
-    font-family: monospace;
-    font-size: 1rem;
-    padding: 1rem;
-    resize: vertical;
-    min-height: 300px;
-    outline: none;
-  }
+    textarea {
+      flex: 1;
+      background: #222;
+      border: none;
+      border-radius: 8px;
+      color: var(--text);
+      font-family: monospace;
+      font-size: 1rem;
+      padding: 1rem;
+      resize: vertical;
+      min-height: 300px;
+      outline: none;
+    }
 
-  button {
-    margin-top: 1rem;
-    padding: 0.8rem 1.2rem;
-    border: none;
-    background: var(--accent);
-    color: var(--text);
-    font-weight: bold;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
+    .size-inputs {
+      margin: 1rem 0 0.5rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+    }
 
-  button:hover {
-    background: #a58bff;
-  }
+    .size-inputs label {
+      flex: 1;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
 
-  .preview-container {
-    flex: 1 1 400px;
-    background: var(--card);
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    .size-inputs input {
+      width: 100%;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      border: 2px solid var(--accent);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+    }
 
-  .device-select {
-    background: var(--bg);
-    padding: 1rem;
-    border-bottom: 1px solid #333;
-    width: 100%;
-    text-align: center;
-  }
+    button {
+      margin-top: 1rem;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      background: var(--accent);
+      color: var(--text);
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-  select {
-    background: var(--card);
-    color: var(--text);
-    border: 2px solid var(--accent);
-    border-radius: 12px;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    outline: none;
-    cursor: pointer;
-  }
+    button:hover {
+      background: #a58bff;
+    }
 
-  iframe {
-    margin: 1rem auto;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
-    width: 375px; /* iPhone X default width */
-    height: 667px; /* iPhone X default height */
-    touch-action: none; /* prevent browser gestures */
-  }
+    .preview-container {
+      flex: 1 1 400px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
 
-  /* Hide native scrollbars but still scrollable */
-  iframe::-webkit-scrollbar {
-    display: none;
-  }
-  iframe {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-</style>
+    iframe {
+      margin: 1rem auto;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 0 15px rgba(127, 90, 240, 0.3);
+      width: 375px;
+      height: 667px;
+      touch-action: none;
+    }
+
+    /* Hide native scrollbars but still scrollable */
+    iframe::-webkit-scrollbar {
+      display: none;
+    }
+    iframe {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Custom Mobile Keyboard Styles */
+    .mobile-keyboard {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--kbd-bg);
+      padding: 0.5rem 0.75rem;
+      border-top: 2px solid var(--accent);
+      border-radius: 0 0 12px 12px;
+      display: none;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.3rem;
+    }
+
+    .key {
+      background: var(--kbd-key-bg);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem;
+      margin: 0 0.15rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.25s ease;
+      flex: 1 0 auto;
+      text-align: center;
+      user-select: none;
+      user-drag: none;
+      min-width: 32px;
+    }
+
+    .key.wide {
+      flex: 2 0 auto;
+      min-width: 70px;
+    }
+
+    .key.extra-wide {
+      flex: 3 0 auto;
+      min-width: 100px;
+    }
+
+    .key:hover {
+      background: var(--kbd-key-hover);
+    }
+  </style>
 </head>
 <body>
 
-<h1>Responsive Layout Tester (Mobile Only)</h1>
+<h1>mobile website tester</h1>
 
 <div class="container">
   <div class="editor">
-    <label for="codeInput">Paste your HTML/CSS here:</label>
-    <textarea id="codeInput" placeholder="Paste your full HTML code here..."></textarea>
+    <label for="codeInput">Paste your full html code in here (including js/css)</label>
+    <textarea id="codeInput" placeholder="Paste your full html code in here (including js/css)"></textarea>
+
+    <div class="size-inputs">
+      <label>
+        Width (px):
+        <input type="number" id="widthInput" min="100" max="1200" value="375" />
+      </label>
+      <label>
+        Height (px):
+        <input type="number" id="heightInput" min="100" max="2000" value="667" />
+      </label>
+    </div>
+
     <button id="loadBtn">Load Preview</button>
   </div>
 
   <div class="preview-container">
-    <div class="device-select">
-      <label for="deviceSize">Select Device:</label>
-      <select id="deviceSize">
-        <option value="375x667" selected>iPhone X (375x667)</option>
-        <option value="360x640">Pixel 2 (360x640)</option>
-        <option value="414x896">iPhone XR (414x896)</option>
-        <option value="320x568">iPhone SE (320x568)</option>
-      </select>
-    </div>
     <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+
+    <div class="mobile-keyboard" id="mobileKeyboard" aria-label="Mobile keyboard">
+      <!-- Row 1 -->
+      <div class="keyboard-row" aria-label="Row 1">
+        <div class="key">q</div><div class="key">w</div><div class="key">e</div><div class="key">r</div><div class="key">t</div><div class="key">y</div><div class="key">u</div><div class="key">i</div><div class="key">o</div><div class="key">p</div>
+      </div>
+      <!-- Row 2 -->
+      <div class="keyboard-row" aria-label="Row 2">
+        <div class="key">a</div><div class="key">s</div><div class="key">d</div><div class="key">f</div><div class="key">g</div><div class="key">h</div><div class="key">j</div><div class="key">k</div><div class="key">l</div>
+      </div>
+      <!-- Row 3 -->
+      <div class="keyboard-row" aria-label="Row 3">
+        <div class="key">z</div><div class="key">x</div><div class="key">c</div><div class="key">v</div><div class="key">b</div><div class="key">n</div><div class="key">m</div><div class="key">,</div><div class="key">.</div><div class="key">@</div>
+      </div>
+      <!-- Row 4 -->
+      <div class="keyboard-row" aria-label="Row 4">
+        <div class="key wide" id="key-space">space</div>
+        <div class="key" id="key-backspace">⌫</div>
+        <div class="key" id="key-enter">⏎</div>
+      </div>
+      <!-- Row 5 -->
+      <div class="keyboard-row" aria-label="Row 5">
+        <div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key">0</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -164,19 +253,77 @@
   const codeInput = document.getElementById('codeInput');
   const loadBtn = document.getElementById('loadBtn');
   const previewFrame = document.getElementById('previewFrame');
-  const deviceSize = document.getElementById('deviceSize');
+  const widthInput = document.getElementById('widthInput');
+  const heightInput = document.getElementById('heightInput');
+  const mobileKeyboard = document.getElementById('mobileKeyboard');
 
-  // Function to set iframe size based on selected device
+  let focusedInput = null;
+
   function updateIframeSize() {
-    const [width, height] = deviceSize.value.split('x').map(Number);
-    previewFrame.style.width = width + 'px';
-    previewFrame.style.height = height + 'px';
+    const width = parseInt(widthInput.value, 10);
+    const height = parseInt(heightInput.value, 10);
+
+    if (!isNaN(width) && width >= 100 && width <= 1200) {
+      previewFrame.style.width = width + 'px';
+    }
+    if (!isNaN(height) && height >= 100 && height <= 2000) {
+      previewFrame.style.height = height + 'px';
+    }
   }
 
-  deviceSize.addEventListener('change', updateIframeSize);
+  widthInput.addEventListener('input', updateIframeSize);
+  heightInput.addEventListener('input', updateIframeSize);
+
   updateIframeSize();
 
-  // Load preview on button click
+  function setupDragScrolling(doc) {
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    const body = doc.body;
+
+    body.style.cursor = 'grab';
+    body.style.overflow = 'auto';
+
+    body.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.pageX - body.offsetLeft;
+      startY = e.pageY - body.offsetTop;
+      scrollLeft = body.scrollLeft;
+      scrollTop = body.scrollTop;
+      body.style.cursor = 'grabbing';
+    });
+
+    body.addEventListener('mouseleave', () => {
+      isDragging = false;
+      body.style.cursor = 'grab';
+    });
+
+    body.addEventListener('mouseup', () => {
+      isDragging = false;
+      body.style.cursor = 'grab';
+    });
+
+    body.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - body.offsetLeft;
+      const y = e.pageY - body.offsetTop;
+      const walkX = (x - startX) * 1.5;
+      const walkY = (y - startY) * 1.5;
+      body.scrollLeft = scrollLeft - walkX;
+      body.scrollTop = scrollTop - walkY;
+    });
+
+    doc.defaultView.addEventListener('wheel', e => {
+      e.preventDefault();
+    }, { passive: false });
+
+    doc.defaultView.addEventListener('keydown', e => {
+      e.preventDefault();
+    });
+  }
+
   loadBtn.addEventListener('click', () => {
     const htmlCode = codeInput.value.trim();
     if (!htmlCode) {
@@ -184,65 +331,79 @@
       return;
     }
 
-    // Write code into iframe
     const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
     doc.open();
     doc.write(htmlCode);
     doc.close();
 
-    // Disable scroll wheel & keyboard inside iframe
-    // Implement drag to scroll
+    setupDragScrolling(doc);
 
-    // Remove scrollbars but allow scrolling by dragging:
-    previewFrame.contentWindow.addEventListener('wheel', e => {
-      e.preventDefault();
-    }, { passive: false });
+    focusedInput = null;
+    mobileKeyboard.style.display = 'none';
 
-    // Keyboard disabling
-    previewFrame.contentWindow.addEventListener('keydown', e => {
-      e.preventDefault();
+    doc.addEventListener('focusin', e => {
+      const target = e.target;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        focusedInput = target;
+        mobileKeyboard.style.display = 'block';
+      }
     });
 
-    // Drag-to-scroll implementation
-    let isDragging = false;
-    let startX, startY, scrollLeft, scrollTop;
-
-    const iframeBody = doc.body;
-
-    iframeBody.style.cursor = 'grab';
-    iframeBody.style.overflow = 'auto';
-
-    iframeBody.addEventListener('mousedown', e => {
-      isDragging = true;
-      startX = e.pageX - iframeBody.offsetLeft;
-      startY = e.pageY - iframeBody.offsetTop;
-      scrollLeft = iframeBody.scrollLeft;
-      scrollTop = iframeBody.scrollTop;
-      iframeBody.style.cursor = 'grabbing';
+    doc.addEventListener('focusout', e => {
+      setTimeout(() => {
+        if (
+          !doc.activeElement ||
+          (doc.activeElement.tagName !== 'INPUT' && doc.activeElement.tagName !== 'TEXTAREA')
+        ) {
+          focusedInput = null;
+          mobileKeyboard.style.display = 'none';
+        }
+      }, 150);
     });
-
-    iframeBody.addEventListener('mouseleave', () => {
-      isDragging = false;
-      iframeBody.style.cursor = 'grab';
-    });
-
-    iframeBody.addEventListener('mouseup', () => {
-      isDragging = false;
-      iframeBody.style.cursor = 'grab';
-    });
-
-    iframeBody.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - iframeBody.offsetLeft;
-      const y = e.pageY - iframeBody.offsetTop;
-      const walkX = (x - startX) * 1.5; //scroll-fast
-      const walkY = (y - startY) * 1.5;
-      iframeBody.scrollLeft = scrollLeft - walkX;
-      iframeBody.scrollTop = scrollTop - walkY;
-    });
-
   });
+
+  mobileKeyboard.addEventListener('click', e => {
+    if (!e.target.classList.contains('key')) return;
+    if (!focusedInput) return;
+
+    const key = e.target.textContent;
+
+    if (key === 'space') {
+      insertText(' ');
+    } else if (key === '⌫') {
+      backspace();
+    } else if (key === '⏎') {
+      insertText('\n');
+    } else {
+      insertText(key);
+    }
+
+    focusedInput.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+  function insertText(text) {
+    const start = focusedInput.selectionStart;
+    const end = focusedInput.selectionEnd;
+    const val = focusedInput.value;
+    focusedInput.value = val.slice(0, start) + text + val.slice(end);
+    focusedInput.selectionStart = focusedInput.selectionEnd = start + text.length;
+    focusedInput.focus();
+  }
+
+  function backspace() {
+    const start = focusedInput.selectionStart;
+    const end = focusedInput.selectionEnd;
+    const val = focusedInput.value;
+
+    if (start === end && start > 0) {
+      focusedInput.value = val.slice(0, start - 1) + val.slice(end);
+      focusedInput.selectionStart = focusedInput.selectionEnd = start - 1;
+    } else if (start !== end) {
+      focusedInput.value = val.slice(0, start) + val.slice(end);
+      focusedInput.selectionStart = focusedInput.selectionEnd = start;
+    }
+    focusedInput.focus();
+  }
 </script>
 
 </body>

@@ -156,19 +156,21 @@ const resultEl = document.getElementById("result");
 const rateInfo = document.getElementById("rateInfo");
 const swapBtn = document.getElementById("swap");
 
-// API endpoints
-const FIAT_API = "https://api.exchangerate.host/convert";
+// APIs
+const FIAT_API = "https://api.frankfurter.app/latest";
 const CRYPTO_API = "https://api.coingecko.com/api/v3/simple/price";
 
-// detect crypto
-function isCrypto(code) {
-  return ["BTC","ETH"].includes(code);
+const cryptoMap = {
+  BTC: "bitcoin",
+  ETH: "ethereum"
+};
+
+function isCrypto(c) {
+  return cryptoMap[c];
 }
 
-// convert function
 async function convert() {
-  const amount = amountEl.value;
-
+  const amount = parseFloat(amountEl.value);
   const from = fromEl.value;
   const to = toEl.value;
 
@@ -176,50 +178,49 @@ async function convert() {
 
   try {
 
-    // FIAT → FIAT
+    // 🟢 FIAT → FIAT
     if (!isCrypto(from) && !isCrypto(to)) {
-      const res = await fetch(`${FIAT_API}?from=${from}&to=${to}&amount=${amount}`);
+      const res = await fetch(`${FIAT_API}?amount=${amount}&from=${from}&to=${to}`);
       const data = await res.json();
 
-      resultEl.value = data.result.toFixed(4);
-      rateInfo.innerText = `1 ${from} = ${(data.result/amount).toFixed(4)} ${to}`;
+      const value = data.rates[to];
+      resultEl.value = value.toFixed(4);
+      rateInfo.innerText = `1 ${from} = ${(value/amount).toFixed(4)} ${to}`;
     }
 
-    // CRYPTO involved → use CoinGecko
+    // 🟣 CRYPTO involved
     else {
-      const ids = {
-        BTC: "bitcoin",
-        ETH: "ethereum"
-      };
+      let usdValue;
 
-      // convert everything via USD
-      const fiatRes = await fetch(`${FIAT_API}?from=${from}&to=USD&amount=${amount}`);
-      const fiatData = await fiatRes.json();
-
-      let usdValue = fiatData.result;
-
+      // FROM → USD
       if (isCrypto(from)) {
-        const c = await fetch(`${CRYPTO_API}?ids=${ids[from]}&vs_currencies=usd`);
-        const d = await c.json();
-        usdValue = amount * d[ids[from]].usd;
+        const res = await fetch(`${CRYPTO_API}?ids=${cryptoMap[from]}&vs_currencies=usd`);
+        const data = await res.json();
+        usdValue = amount * data[cryptoMap[from]].usd;
+      } else {
+        const res = await fetch(`${FIAT_API}?amount=${amount}&from=${from}&to=USD`);
+        const data = await res.json();
+        usdValue = data.rates["USD"];
       }
 
+      // USD → TO
       if (isCrypto(to)) {
-        const c = await fetch(`${CRYPTO_API}?ids=${ids[to]}&vs_currencies=usd`);
-        const d = await c.json();
-        resultEl.value = (usdValue / d[ids[to]].usd).toFixed(8);
+        const res = await fetch(`${CRYPTO_API}?ids=${cryptoMap[to]}&vs_currencies=usd`);
+        const data = await res.json();
+        resultEl.value = (usdValue / data[cryptoMap[to]].usd).toFixed(8);
       } else {
-        const fiatRes2 = await fetch(`${FIAT_API}?from=USD&to=${to}&amount=${usdValue}`);
-        const fiatData2 = await fiatRes2.json();
-        resultEl.value = fiatData2.result.toFixed(4);
+        const res = await fetch(`${FIAT_API}?amount=${usdValue}&from=USD&to=${to}`);
+        const data = await res.json();
+        resultEl.value = data.rates[to].toFixed(4);
       }
 
       rateInfo.innerText = "Live crypto + fiat conversion";
     }
 
-  } catch (err) {
+  } catch (e) {
+    console.error(e);
     resultEl.value = "Error";
-    rateInfo.innerText = "API error";
+    rateInfo.innerText = "API failed (rate limit or network)";
   }
 }
 

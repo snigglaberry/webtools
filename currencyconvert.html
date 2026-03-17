@@ -1,1 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Currency Converter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #111;
+      --card: #1c1c1c;
+      --accent: #7f5af0;
+      --text: #fff;
+      --muted: #aaa;
+    }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .converter-box {
+      background-color: var(--card);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.2);
+      margin-bottom: 2rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .currency-input {
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 2px solid rgba(127, 90, 240, 0.3);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .currency-input:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.3);
+    }
+
+    .currency-icon {
+      padding: 0.8rem 1rem;
+      font-size: 1.5rem;
+      background-color: rgba(127, 90, 240, 0.2);
+      border-right: 2px solid rgba(127, 90, 240, 0.3);
+    }
+
+    .currency-input input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.1rem;
+      outline: none;
+    }
+
+    .currency-input input::placeholder {
+      color: var(--muted);
+    }
+
+    select {
+      padding: 0.8rem 1rem;
+      background-color: var(--card);
+      color: var(--text);
+      border: 2px solid rgba(127, 90, 240, 0.3);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(127, 90, 240, 0.3);
+    }
+
+    select option {
+      background-color: var(--card);
+      color: var(--text);
+    }
+
+    .swap-btn {
+      grid-column: 1 / -1;
+      padding: 0.8rem 1.5rem;
+      background-color: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      align-self: center;
+      width: 100%;
+    }
+
+    .swap-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    .result {
+      background-color: rgba(127, 90, 240, 0.1);
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .info-card {
+      background-color: rgba(127, 90, 240, 0.1);
+      border-left: 4px solid var(--accent);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .info-card .icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    .info-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .converter-box {
+        padding: 1.5rem;
+      }
+
+      .result-value {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>💱 Currency Converter</h1>
+    <p class="subtitle">Convert between fiat and cryptocurrencies in real-time</p>
+
+    <div class="converter-box">
+      <div class="row">
+        <div class="form-group">
+          <label for="fromAmount">Amount</label>
+          <div class="currency-input">
+            <input type="number" id="fromAmount" placeholder="Enter amount" value="1" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fromCurrency">From Currency</label>
+          <select id="fromCurrency">
+            <optgroup label="🌍 Fiat Currencies">
+              <option value="USD">🇺🇸 USD - US Dollar</option>
+              <option value="EUR">🇪🇺 EUR - Euro</option>
+              <option value="GBP">🇬🇧 GBP - British Pound</option>
+              <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
+              <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+              <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+              <option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+              <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+              <option value="INR">🇮🇳 INR - Indian Rupee</option>
+              <option value="MXN">🇲🇽 MXN - Mexican Peso</option>
+              <option value="BRL">🇧🇷 BRL - Brazilian Real</option>
+              <option value="ZAR">🇿🇦 ZAR - South African Rand</option>
+              <option value="KRW">🇰🇷 KRW - South Korean Won</option>
+              <option value="SGD">🇸🇬 SGD - Singapore Dollar</option>
+              <option value="HKD">🇭🇰 HKD - Hong Kong Dollar</option>
+              <option value="NZD">🇳🇿 NZD - New Zealand Dollar</option>
+              <option value="SEK">🇸🇪 SEK - Swedish Krona</option>
+              <option value="NOK">🇳🇴 NOK - Norwegian Krone</option>
+              <option value="DKK">🇩🇰 DKK - Danish Krone</option>
+              <option value="RUB">🇷🇺 RUB - Russian Ruble</option>
+              <option value="TRY">🇹🇷 TRY - Turkish Lira</option>
+              <option value="AED">🇦🇪 AED - UAE Dirham</option>
+              <option value="SAR">🇸🇦 SAR - Saudi Riyal</option>
+              <option value="THB">🇹🇭 THB - Thai Baht</option>
+              <option value="MYR">🇲🇾 MYR - Malaysian Ringgit</option>
+              <option value="PHP">🇵🇭 PHP - Philippine Peso</option>
+              <option value="IDR">🇮🇩 IDR - Indonesian Rupiah</option>
+              <option value="VND">🇻🇳 VND - Vietnamese Dong</option>
+              <option value="PKR">🇵🇰 PKR - Pakistani Rupee</option>
+              <option value="BGN">🇧🇬 BGN - Bulgarian Lev</option>
+              <option value="CZK">🇨🇿 CZK - Czech Koruna</option>
+              <option value="HRK">🇭🇷 HRK - Croatian Kuna</option>
+              <option value="HUF">🇭🇺 HUF - Hungarian Forint</option>
+              <option value="PLN">🇵🇱 PLN - Polish Zloty</option>
+              <option value="RON">🇷🇴 RON - Romanian Leu</option>
+              <option value="ILS">🇮🇱 ILS - Israeli Shekel</option>
+            </optgroup>
+            <optgroup label="🪙 Cryptocurrencies">
+              <option value="BTC">₿ BTC - Bitcoin</option>
+              <option value="ETH">Ξ ETH - Ethereum</option>
+              <option value="XRP">XRP - Ripple</option>
+              <option value="ADA">₳ ADA - Cardano</option>
+              <option value="SOL">◎ SOL - Solana</option>
+              <option value="DOT">● DOT - Polkadot</option>
+              <option value="DOGE">🐕 DOGE - Dogecoin</option>
+              <option value="LTC">Ł LTC - Litecoin</option>
+              <option value="BCH">BCH - Bitcoin Cash</option>
+              <option value="MATIC">MATIC - Polygon</option>
+              <option value="LINK">LINK - Chainlink</option>
+              <option value="USDT">USDT - Tether</option>
+              <option value="USDC">USDC - USD Coin</option>
+              <option value="BNB">BNB - Binance Coin</option>
+              <option value="AVAX">AVAX - Avalanche</option>
+              <option value="ATOM">ATOM - Cosmos</option>
+              <option value="XLM">✦ XLM - Stellar Lumens</option>
+              <option value="VET">VET - VeChain</option>
+              <option value="FIL">FIL - Filecoin</option>
+              <option value="SHIB">SHIB - Shiba Inu</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <button class="swap-btn" id="swapBtn">⇅ Swap Currencies</button>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="toAmount">Converted Amount</label>
+          <div class="currency-input">
+            <input type="number" id="toAmount" placeholder="0.00" readonly>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="toCurrency">To Currency</label>
+          <select id="toCurrency">
+            <optgroup label="🌍 Fiat Currencies">
+              <option value="USD" selected>🇺🇸 USD - US Dollar</option>
+              <option value="EUR">🇪🇺 EUR - Euro</option>
+              <option value="GBP">🇬🇧 GBP - British Pound</option>
+              <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
+              <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+              <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+              <option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+              <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+              <option value="INR">🇮🇳 INR - Indian Rupee</option>
+              <option value="MXN">🇲🇽 MXN - Mexican Peso</option>
+              <option value="BRL">🇧🇷 BRL - Brazilian Real</option>
+              <option value="ZAR">🇿🇦 ZAR - South African Rand</option>
+              <option value="KRW">🇰🇷 KRW - South Korean Won</option>
+              <option value="SGD">🇸🇬 SGD - Singapore Dollar</option>
+              <option value="HKD">🇭🇰 HKD - Hong Kong Dollar</option>
+              <option value="NZD">🇳🇿 NZD - New Zealand Dollar</option>
+              <option value="SEK">🇸🇪 SEK - Swedish Krona</option>
+              <option value="NOK">🇳🇴 NOK - Norwegian Krone</option>
+              <option value="DKK">🇩🇰 DKK - Danish Krone</option>
+              <option value="RUB">🇷🇺 RUB - Russian Ruble</option>
+              <option value="TRY">🇹🇷 TRY - Turkish Lira</option>
+              <option value="AED">🇦🇪 AED - UAE Dirham</option>
+              <option value="SAR">🇸🇦 SAR - Saudi Riyal</option>
+              <option value="THB">🇹🇭 THB - Thai Baht</option>
+              <option value="MYR">🇲🇾 MYR - Malaysian Ringgit</option>
+              <option value="PHP">🇵🇭 PHP - Philippine Peso</option>
+              <option value="IDR">🇮🇩 IDR - Indonesian Rupiah</option>
+              <option value="VND">🇻🇳 VND - Vietnamese Dong</option>
+              <option value="PKR">🇵🇰 PKR - Pakistani Rupee</option>
+              <option value="BGN">🇧🇬 BGN - Bulgarian Lev</option>
+              <option value="CZK">🇨🇿 CZK - Czech Koruna</option>
+              <option value="HRK">🇭🇷 HRK - Croatian Kuna</option>
+              <option value="HUF">🇭🇺 HUF - Hungarian Forint</option>
+              <option value="PLN">🇵🇱 PLN - Polish Zloty</option>
+              <option value="RON">🇷🇴 RON - Romanian Leu</option>
+              <option value="ILS">🇮🇱 ILS - Israeli Shekel</option>
+            </optgroup>
+            <optgroup label="🪙 Cryptocurrencies">
+              <option value="BTC">₿ BTC - Bitcoin</option>
+              <option value="ETH">Ξ ETH - Ethereum</option>
+              <option value="XRP">XRP - Ripple</option>
+              <option value="ADA">₳ ADA - Cardano</option>
+              <option value="SOL">◎ SOL - Solana</option>
+              <option value="DOT">● DOT - Polkadot</option>
+              <option value="DOGE">🐕 DOGE - Dogecoin</option>
+              <option value="LTC">Ł LTC - Litecoin</option>
+              <option value="BCH">BCH - Bitcoin Cash</option>
+              <option value="MATIC">MATIC - Polygon</option>
+              <option value="LINK">LINK - Chainlink</option>
+              <option value="USDT">USDT - Tether</option>
+              <option value="USDC">USDC - USD Coin</option>
+              <option value="BNB">BNB - Binance Coin</option>
+              <option value="AVAX">AVAX - Avalanche</option>
+              <option value="ATOM">ATOM - Cosmos</option>
+              <option value="XLM">✦ XLM - Stellar Lumens</option>
+              <option value="VET">VET - VeChain</option>
+              <option value="FIL">FIL - Filecoin</option>
+              <option value="SHIB">SHIB - Shiba Inu</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <button class="swap-btn" id="swapBtn">⇅ Swap Currencies</button>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="toAmount">Converted Amount</label>
+          <div class="currency-input">
+            <input type="number" id="toAmount" placeholder="0.00" readonly>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="toCurrency">To Currency</label>
+          <select id="toCurrency">
+            <optgroup label="🌍 Fiat Currencies">
+              <option value="USD" selected>🇺🇸 USD - US Dollar</option>
+              <option value="EUR">🇪🇺 EUR - Euro</option>
+              <option value="GBP">🇬🇧 GBP - British Pound</option>
+              <option value="JPY">🇯🇵 JPY - Japanese Yen</option>
+              <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+              <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+              <option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+              <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+              <option value="INR">🇮🇳 INR - Indian Rupee</option>
+              <option value="MXN">🇲🇽 MXN - Mexican Peso</option>
+              <option value="BRL">🇧🇷 BRL - Brazilian Real</option>
+              <option value="ZAR">🇿🇦 ZAR - South African Rand</option>
+              <option value="KRW">🇰🇷 KRW - South Korean Won</option>
+              <option value="SGD">🇸🇬 SGD - Singapore Dollar</option>
+              <option value="HKD">🇭🇰 HKD - Hong Kong Dollar</option>
+              <option value="NZD">🇳🇿 NZD - New Zealand Dollar</option>
+              <option value="SEK">🇸🇪 SEK - Swedish Krona</option>
+              <option value="NOK">🇳🇴 NOK - Norwegian Krone</option>
+              <option value="DKK">🇩🇰 DKK - Danish Krone</option>
+              <option value="RUB">🇷🇺 RUB - Russian Ruble</option>
+              <option value="TRY">🇹🇷 TRY - Turkish Lira</option>
+              <option value="AED">🇦🇪 AED - UAE Dirham</option>
+              <option value="SAR">🇸🇦 SAR - Saudi Riyal</option>
+              <option value="THB">🇹🇭 THB - Thai Baht</option>
+              <option value="MYR">🇲🇾 MYR - Malaysian Ringgit</option>
+              <option value="PHP">🇵🇭 PHP - Philippine Peso</option>
+              <option value="IDR">🇮🇩 IDR - Indonesian Rupiah</option>
+              <option value="VND">🇻🇳 VND - Vietnamese Dong</option>
+              <option value="PKR">🇵🇰 PKR - Pakistani Rupee</option>
+              <option value="BGN">🇧🇬 BGN - Bulgarian Lev</option>
+              <option value="CZK">🇨🇿 CZK - Czech Koruna</option>
+              <option value="HRK">🇭🇷 HRK - Croatian Kuna</option>
+              <option value="HUF">🇭🇺 HUF - Hungarian Forint</option>
+              <option value="PLN">🇵🇱 PLN - Polish Zloty</option>
+              <option value="RON">🇷🇴 RON - Romanian Leu</option>
+              <option value="ILS">🇮🇱 ILS - Israeli Shekel</option>
+            </optgroup>
+            <optgroup label="🪙 Cryptocurrencies">
+              <option value="BTC">₿ BTC - Bitcoin</option>
+              <option value="ETH">Ξ ETH - Ethereum</option>
+              <option value="XRP">XRP - Ripple</option>
+              <option value="ADA">₳ ADA - Cardano</option>
+              <option value="SOL">◎ SOL - Solana</option>
+              <option value="DOT">● DOT - Polkadot</option>
+              <option value="DOGE">🐕 DOGE - Dogecoin</option>
+              <option value="LTC">Ł LTC - Litecoin</option>
+              <option value="BCH">BCH - Bitcoin Cash</option>
+              <option value="MATIC">MATIC - Polygon</option>
+              <option value="LINK">LINK - Chainlink</option>
+              <option value="USDT">USDT - Tether</option>
+              <option value="USDC">USDC - USD Coin</option>
+              <option value="BNB">BNB - Binance Coin</option>
+              <option value="AVAX">AVAX - Avalanche</option>
+              <option value="ATOM">ATOM - Cosmos</option>
+              <option value="XLM">✦ XLM - Stellar Lumens</option>
+              <option value="VET">VET - VeChain</option>
+              <option value="FIL">FIL - Filecoin</option>
+              <option value="SHIB">SHIB - Shiba Inu</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <p><span class="icon">📊</span><strong>Real-time Rates:</strong> Uses live market data</p>
+      </div>
+      <div class="info-card">
+        <p><span class="icon">🔄</span><strong>Bidirectional:</strong> Swap currencies instantly</p>
+      </div>
+      <div class="info-card">
+        <p><span class="icon">🪙</span><strong>All Assets:</strong> 30+ Fiat + 20+ Crypto</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fromAmount = document.getElementById('fromAmount');
+    const toAmount = document.getElementById('toAmount');
+    const fromCurrency = document.getElementById('fromCurrency');
+    const toCurrency = document.getElementById('toCurrency');
+    const swapBtn = document.getElementById('swapBtn');
+
+    // Exchange rates (using approximate rates for demo)
+    // In production, fetch from API like exchangerate-api.com
+    const exchangeRates = {
+      'USD': 1,
+      'EUR': 0.92, 'GBP': 0.79, 'JPY': 149.5, 'CAD': 1.36, 'AUD': 1.52,
+      'CHF': 0.88, 'CNY': 7.24, 'INR': 83.12, 'MXN': 17.05, 'BRL': 4.97,
+      'ZAR': 18.45, 'KRW': 1319.5, 'SGD': 1.34, 'HKD': 7.81, 'NZD': 1.62,
+      'SEK': 10.45, 'NOK': 10.65, 'DKK': 6.87, 'RUB': 91.5, 'TRY': 32.5,
+      'AED': 3.67, 'SAR': 3.75, 'THB': 35.45, 'MYR': 4.73, 'PHP': 56.2,
+      'IDR': 16075, 'VND': 24450, 'PKR': 278.5, 'BGN': 1.80, 'CZK': 22.8,
+      'HRK': 6.85, 'HUF': 363.5, 'PLN': 3.98, 'RON': 4.58, 'ILS': 3.68,
+      'BTC': 0.000024, 'ETH': 0.00034, 'XRP': 2.4, 'ADA': 0.65, 'SOL': 0.044,
+      'DOT': 0.12, 'DOGE': 0.14, 'LTC': 0.0095, 'BCH': 0.0048, 'MATIC': 0.38,
+      'LINK': 0.031, 'USDT': 1, 'USDC': 1, 'BNB': 0.0038, 'AVAX': 0.042,
+      'ATOM': 0.12, 'XLM': 0.52, 'VET': 3.5, 'FIL': 0.0048, 'SHIB': 12500
+    };
+
+    function convert() {
+      const amount = parseFloat(fromAmount.value) || 0;
+      if (amount === 0) {
+        toAmount.value = '0.00';
+        return;
+      }
+
+      const fromRate = exchangeRates[fromCurrency.value];
+      const toRate = exchangeRates[toCurrency.value];
+
+      if (!fromRate || !toRate) {
+        toAmount.value = 'N/A';
+        return;
+      }
+
+      const result = (amount * fromRate) / toRate;
+      toAmount.value = result.toFixed(8);
+    }
+
+    function swap() {
+      const tempCurrency = fromCurrency.value;
+      fromCurrency.value = toCurrency.value;
+      toCurrency.value = tempCurrency;
+
+      const tempAmount = fromAmount.value;
+      fromAmount.value = toAmount.value;
+      toAmount.value = tempAmount;
+    }
+
+    fromAmount.addEventListener('input', convert);
+    fromCurrency.addEventListener('change', convert);
+    toCurrency.addEventListener('change', convert);
+    swapBtn.addEventListener('click', swap);
+
+    // Initial conversion
+    convert();
+  </script>
+
+</body>
+</html>
